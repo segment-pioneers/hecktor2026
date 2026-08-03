@@ -22,8 +22,11 @@ import argparse
 import numpy as np
 import pandas as pd
 
-import tn_features
-from surv_features import (
+from segmentation.model_inference import (
+    load_segmentation_model,
+    predict_masks,
+)
+from .surv_features import (
     build_survival_feature_vector,
     FEATURE_NAMES,
 )
@@ -114,7 +117,7 @@ def build_dataset(
 
         pet, ct = load_pet_ct(npz_path)
 
-        pred_tumor, pred_node = tn_features.predict_masks(
+        pred_tumor, pred_node = predict_masks(
             seg_model,
             pet,
             ct,
@@ -181,7 +184,7 @@ def main(
     )
 
     print(f"Loading segmentation model: {seg_model}")
-    seg_model_obj = tn_features.load_segmentation_model(
+    seg_model_obj = load_segmentation_model(
         seg_model,
         device,
     )

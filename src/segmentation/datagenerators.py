@@ -244,6 +244,13 @@ def make_surv_array(time, event):
 #--------------------------------------------------------------------------------------
     
 def Data_augmentation_seg(PET, CT, Seg_Tumor, Seg_Node):
+
+    #print("\nBEFORE AUGMENTATION")
+    #print("PET:", PET.shape)
+    #print("CT:", CT.shape)
+    #print("Seg_Tumor:", Seg_Tumor.shape)
+    #print("Seg_Node:", Seg_Node.shape)
+
     
     # define augmentation sequence
     aug_seq = iaa.Sequential([
@@ -252,7 +259,8 @@ def Data_augmentation_seg(PET, CT, Seg_Tumor, Seg_Node):
                    scale={"x": (0.9, 1.1), "y": (1.0, 1.0)},
                    shear=(-10, 10),
                    rotate=(-10, 10)),
-        iaa.CropToFixedSize(width=112, height=None)
+        #iaa.CropToFixedSize(width=112, height=None)
+        iaa.CropToFixedSize(width=160, height=None)
         ],random_order=False)
     
     # pre-process data shape
@@ -306,15 +314,25 @@ def Data_augmentation_seg(PET, CT, Seg_Tumor, Seg_Node):
     Seg_Node = np.transpose(Seg_Node,(0,3,1,2))
     
     # reset Seg mask to 1/0
-    for i in range(Seg_Tumor.shape[0]):
-        _, Seg_Tumor[i] = cv2.threshold(Seg_Tumor[i],0.2,1,cv2.THRESH_BINARY)
-        _, Seg_Node[i] = cv2.threshold(Seg_Node[i],0.2,1,cv2.THRESH_BINARY)
+    #for i in range(Seg_Tumor.shape[0]):
+    #    _, Seg_Tumor[i] = cv2.threshold(Seg_Tumor[i],0.2,1,cv2.THRESH_BINARY)
+    #    _, Seg_Node[i] = cv2.threshold(Seg_Node[i],0.2,1,cv2.THRESH_BINARY)
+    
+    # reset Seg mask to 1/0 safely across all dimensions
+    Seg_Tumor = (Seg_Tumor > 0.2).astype(np.float32)
+    Seg_Node = (Seg_Node > 0.2).astype(np.float32)
     
     # post-process data shape
     PET = PET[..., np.newaxis].transpose((0,4,1,2,3))
     CT = CT[..., np.newaxis].transpose((0,4,1,2,3))
     Seg_Tumor = Seg_Tumor[..., np.newaxis].transpose((0,4,1,2,3))
     Seg_Node = Seg_Node[..., np.newaxis].transpose((0,4,1,2,3))
+
+    #print("\nAFTER AUGMENTATION")
+    #print("PET:", PET.shape)
+    #print("CT:", CT.shape)
+    #print("Seg_Tumor:", Seg_Tumor.shape)
+    #print("Seg_Node:", Seg_Node.shape)
     
     return PET, CT, Seg_Tumor, Seg_Node
     
@@ -328,7 +346,8 @@ def Data_augmentation_surv(PET, CT):
                    scale={"x": (0.9, 1.1), "y": (1.0, 1.0)},
                    shear=(-10, 10),
                    rotate=(-10, 10)),
-        iaa.CropToFixedSize(width=112, height=None)
+        #iaa.CropToFixedSize(width=112, height=None)
+        iaa.CropToFixedSize(width=160, height=None)
         ],random_order=False)
     
     

@@ -13,9 +13,7 @@ import cv2
 import numpy as np
 from argparse import ArgumentParser
 
-import datagenerators
-import networks
-import losses
+from . import datagenerators, networks, losses
 
 
 def lr_scheduler(epoch):
@@ -92,8 +90,10 @@ def validate(model, data_dir, valid_samples, device, Losses, Weights):
 
             seg_tumor_pred = pred[0].detach().cpu().numpy().squeeze()
             seg_node_pred = pred[1].detach().cpu().numpy().squeeze()
-            _, seg_tumor_pred = cv2.threshold(seg_tumor_pred, 0.5, 1, cv2.THRESH_BINARY)
-            _, seg_node_pred = cv2.threshold(seg_node_pred, 0.5, 1, cv2.THRESH_BINARY)
+            #_, seg_tumor_pred = cv2.threshold(seg_tumor_pred, 0.5, 1, cv2.THRESH_BINARY)
+            #_, seg_node_pred = cv2.threshold(seg_node_pred, 0.5, 1, cv2.THRESH_BINARY)
+            seg_tumor_pred = (seg_tumor_pred > 0.5).astype(np.float32)
+            seg_node_pred  = (seg_node_pred  > 0.5).astype(np.float32)
 
             tumor_inter += np.sum(seg_tumor_pred * seg_tumor)
             tumor_union += np.sum(seg_tumor_pred + seg_tumor)
@@ -109,7 +109,7 @@ def validate(model, data_dir, valid_samples, device, Losses, Weights):
     return val_loss, dice_tumor, dice_node, dice_mean
 
 
-def save_latest(path, model, optimizer, epoch, val_loss, best_val_loss, best_epoch):
+def save_latest(path, model, optimizer, epoch, val_loss, best_val_loss, best_epoch, best_metrics=None):
     torch.save({
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
@@ -117,6 +117,7 @@ def save_latest(path, model, optimizer, epoch, val_loss, best_val_loss, best_epo
         'val_loss': val_loss,
         'best_val_loss': best_val_loss,
         'best_epoch': best_epoch,
+        'best_metrics': best_metrics,
     }, path)
 
 
@@ -181,6 +182,7 @@ def train(data_dir,
         initial_epoch = ckpt['epoch'] + 1
         best_val_loss = ckpt.get('best_val_loss', float('inf'))
         best_epoch = ckpt.get('best_epoch', -1)
+        best_metrics = ckpt.get('best_metrics', {})
         logger.info(
             'Resumed at epoch %d (best val_loss %.4f at epoch %d)',
             initial_epoch, best_val_loss, best_epoch + 1)
@@ -253,7 +255,7 @@ def train(data_dir,
             logger.info('New best model saved to %s (val_loss=%.4f)', best_path, val_loss)
 
         save_latest(latest_path, model, optimizer, epoch, val_loss,
-                    best_val_loss, best_epoch)
+                    best_val_loss, best_epoch, best_metrics)
 
         elapsed = time.time() - start_time
         msg = (

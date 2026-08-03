@@ -77,6 +77,21 @@ def train_rsf(
         random_state=random_state,
     )
 
+
+    '''
+    model = RandomSurvivalForest(
+        n_estimators=300,        # 1000 is overkill and increases variance
+        min_samples_split=40,    # Increase to prevent hyper-specific splits
+        min_samples_leaf=20,     # Ensure leaves represent a solid patient sub-population
+        max_features="sqrt",
+        n_jobs=-1,
+        random_state=random_state,
+    )
+    
+    
+    
+    '''
+
     model.fit(
         X_train,
         y_train,

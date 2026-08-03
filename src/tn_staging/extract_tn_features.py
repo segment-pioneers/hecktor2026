@@ -8,7 +8,7 @@ import pandas as pd
 
 from argparse import ArgumentParser
 
-import tn_features
+from . import tn_features
 
 
 # ------------------------------------------------------------
@@ -66,7 +66,7 @@ def load_all_npz_files(data_dir):
 # Main
 # ------------------------------------------------------------
 
-def extract_features(data_dir, clinical_csv, seg_model, output_cache, device):
+def extract_features(data_dir, clinical_csv, output_cache):
 
     output_dir = os.path.dirname(output_cache)
 
@@ -81,7 +81,10 @@ def extract_features(data_dir, clinical_csv, seg_model, output_cache, device):
 
     logger.info("Found %d NPZ files", len(sample_names))
 
-    logger.info("Building feature table...")
+    logger.info(
+        "Building feature table "
+        "(ground-truth MASK from NPZ)..."
+    )
 
     start_time = time.time()
 
@@ -90,8 +93,6 @@ def extract_features(data_dir, clinical_csv, seg_model, output_cache, device):
             data_dir=data_dir,
             sample_names=sample_names,
             clinical_csv=clinical_csv,
-            seg_model_path=seg_model,
-            device=device
         )
     )
 
@@ -125,17 +126,13 @@ if __name__ == "__main__":
 
     parser.add_argument("--data_dir", type=str, required=True, help="Directory containing .npz files")
     parser.add_argument("--clinical_csv", type=str, required=True, help="HECKTOR clinical CSV")
-    parser.add_argument("--seg_model", type=str, required=True, help="best.pt from Stage-I segmentation")
     parser.add_argument("--output_cache", type=str, required=True, help="Output .pkl file")
-    parser.add_argument("--device", type=str, default="cpu", help="cpu or cuda")
 
     args = parser.parse_args()
 
     extract_features(
         data_dir=args.data_dir,
         clinical_csv=args.clinical_csv,
-        seg_model=args.seg_model,
         output_cache=args.output_cache,
-        device=args.device
     )
 

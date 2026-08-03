@@ -23,7 +23,7 @@ import pickle
 import logging
 import argparse
 
-from surv_models import (
+from .surv_models import (
     train_rsf,
     evaluate_cindex,
     feature_importance,

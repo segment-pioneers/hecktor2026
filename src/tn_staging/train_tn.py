@@ -10,8 +10,7 @@ import pandas as pd
 
 from argparse import ArgumentParser
 
-import tn_features
-import tn_models
+from . import tn_features, tn_models
 
 
 # ------------------------------------------------------------
