@@ -29,4 +29,4 @@ The following models are required:
 The trained model weights can be downloaded from:
 
 **Google Drive:**  
-[<Google Drive link>](https://drive.google.com/drive/folders/1ZdemzSqPonO6UNYtX4rNA0deQ1Hle8HO?usp=sharing)
+[Download model weights](https://drive.google.com/drive/folders/1ZdemzSqPonO6UNYtX4rNA0deQ1Hle8HO?usp=sharing)
