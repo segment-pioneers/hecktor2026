@@ -5,24 +5,24 @@ This directory contains the trained model weights required by the inference pipe
 The following models are required:
 
 - Segmentation
-  - `seg_fold1.pth`
-  - `seg_fold2.pth`
-  - `seg_fold3.pth`
-  - `seg_fold4.pth`
-  - `seg_fold5.pth`
+  - `seg_fold1.pt`
+  - `seg_fold2.pt`
+  - `seg_fold3.pt`
+  - `seg_fold4.pt`
+  - `seg_fold5.pt`
 
 - TN Staging
-  - `t_stage_fold1.cbm`
+  - `best_t_model_fold1.cbm`
   - ...
-  - `t_stage_fold5.cbm`
-  - `n_stage_fold1.cbm`
+  - `best_t_model_fold5.cbm`
+  - `best_n_model_fold1.cbm`
   - ...
-  - `n_stage_fold5.cbm`
+  - `best_n_model_fold5.cbm`
 
 - Recurrence-Free Survival Prediction
-  - `rfs_fold1.pkl`
+  - `survival_fold1.pkl`
   - ...
-  - `rfs_fold5.pkl`
+  - `survival_fold5.pkl`
 
 ## Download
 
