@@ -154,6 +154,3 @@ Repeat **Sections 5–7** for Folds **2–5** by replacing the corresponding tra
 2. **Survival metrics:** C-index requires **at least one event** (`Relapse == 1`) in validation (and in training if train C-index is reported). All-censored sets will raise an error.
 3. **NumPy / imgaug:** Segmentation augmentation uses `imgaug`. On setup or training errors, try changing the NumPy version (see `requirements.txt`) and reinstalling—pin conflicts vary by environment.
 
-
-
-Please refer to **`src/inference/README.md`** for instructions on reproducing the inference pipeline used in the HECKTOR 2026 challenge submission.
