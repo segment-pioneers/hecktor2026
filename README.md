@@ -1,5 +1,7 @@
 # Deep Learning-Based Segmentation and Feature-Based Clinical Prediction for Head and Neck Cancer
 
+**Status:** Companion code for the HECKTOR 2026 challenge paper *(under review).*
+
 ![Figure 1](./Images/Fig.%201.png)
 
 # Reproducing the Experiments
@@ -154,3 +156,9 @@ Repeat **Sections 5–7** for Folds **2–5** by replacing the corresponding tra
 2. **Survival metrics:** C-index requires **at least one event** (`Relapse == 1`) in validation (and in training if train C-index is reported). All-censored sets will raise an error.
 3. **NumPy / imgaug:** Segmentation augmentation uses `imgaug`. On setup or training errors, try changing the NumPy version (see `requirements.txt`) and reinstalling—pin conflicts vary by environment.
 
+## Contact
+
+If you encounter any issues while reproducing the experiments or have questions about the repository, please feel free to contact:
+
+**Yasar Mehmood**  
+Email: yasar.mehmood111@gmail.com
