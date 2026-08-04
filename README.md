@@ -148,7 +148,7 @@ python -m survival.train_surv \
 
 ## 9. Repeat for the Remaining Folds
 
-Repeat **Sections 5–7** for Folds **2–5** by replacing the corresponding training and validation split files and output directories.
+Repeat **Sections 6–8** for Folds **2–5** by replacing the corresponding training and validation split files and output directories.
 
 ## Notes
 
