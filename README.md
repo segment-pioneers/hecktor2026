@@ -121,7 +121,10 @@ python -m tn_staging.predict_tn \
 
 ### 8.1 Extract Survival Features
 
-Extract the handcrafted feature representation used for recurrence-free survival prediction.
+Extract the handcrafted feature representation used for recurrence-free survival prediction. Create the output directory (e.g., /path/to/output/survival/fold1) first if it does not exist (the script does not create it automatically):
+```bash
+mkdir -p /path/to/output/survival/fold1/
+
 
 ```bash
 python -m survival.extract_surv_features \
