@@ -15,7 +15,7 @@ It is assumed that the HECKTOR 2026 dataset has already been downloaded from the
 Clone the repository and navigate to its root directory.
 
 ```bash
-git clone [<repository_url>](https://github.com/segment-pioneers/hecktor2026)
+git clone https://github.com/segment-pioneers/hecktor2026
 cd hecktor2026
 ```
 
