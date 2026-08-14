@@ -159,6 +159,12 @@ Repeat **Sections 6–8** for Folds **2–5** by replacing the corresponding tra
 2. **Survival metrics:** C-index requires **at least one event** (`Relapse == 1`) in validation (and in training if train C-index is reported). All-censored sets will raise an error.
 3. **NumPy / imgaug:** Segmentation augmentation uses `imgaug`. On setup or training errors, try changing the NumPy version (see `requirements.txt`) and reinstalling—pin conflicts vary by environment.
 
+## Pre-trained Model Weights
+
+Pre-trained model weights used by the inference pipeline are available for download.
+
+Please refer to **`src/inference/models/README.md`** for the list of required model weights and the download link.
+
 ## Contact
 
 If you encounter any issues while reproducing the experiments or have questions about the repository, please feel free to contact:
