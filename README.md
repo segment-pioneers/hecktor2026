@@ -45,7 +45,7 @@ pip install -r requirements.txt
 Before training, run `src/preprocessing/Preprocess_224.ipynb`.
 - Set `ROOT` to the raw HECKTOR data root and `DESTINATION` to the output folder for preprocessed `.npz` files.
 - Run all cells to resample to 1 mm isotropic and produce 224³ NPZ volumes.
-Use `DESTINATION` as `--data_dir` / `/path/to/preprocessed_data/` in the following sections.
+Use `DESTINATION` as `--data_dir` `/path/to/preprocessed_data/` in the following sections.
 
 ## 4. Navigate to the Source Directory
 
