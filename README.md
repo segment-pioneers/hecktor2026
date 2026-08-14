@@ -2,7 +2,7 @@
 
 **Status:** Companion code for the HECKTOR 2026 challenge paper *(under review).*
 
-![Figure 1](./Images/fig1.png)
+![Figure 1](Images/fig1.png)
 
 # Reproducing the Experiments
 
