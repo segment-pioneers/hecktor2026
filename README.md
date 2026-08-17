@@ -121,15 +121,13 @@ python -m tn_staging.predict_tn \
 
 ### 8.1 Extract Survival Features
 
-Extract the handcrafted feature representation used for recurrence-free survival prediction. By default, imaging features are computed from **predicted** segmentation masks (`--mask_source predicted`). The script creates the output directory if it does not exist.
+Extract the handcrafted feature representation used for recurrence-free survival prediction. By default, imaging features are computed from the NPZ **ground-truth** `MASK` (`--mask_source ground_truth`). The script creates the output directory if it does not exist.
 
 ```bash
 python -m survival.extract_surv_features \
     --data_dir /path/to/preprocessed_data/ \
     --clinical_csv /path/to/HECKTOR_2026_training_data.csv \
     --tn_predictions /path/to/output/tn_staging/fold1/tn_predictions.pkl \
-    --seg_model /path/to/output/segmentation/fold1/best.pt \
-    --device cuda \
     --train_samples /path/to/data_splits/fold1_train.npy \
     --valid_samples /path/to/data_splits/fold1_valid.npy \
     --output_file /path/to/output/survival/fold1/survival_features.pkl
@@ -150,7 +148,8 @@ python -m survival.train_surv \
 
 TN staging and survival can extract imaging features from either ground-truth or predicted segmentations via `--mask_source {ground_truth,predicted}`.
 
-- **Default pipeline (this repository / challenge submission):** TN features from **ground-truth** masks; survival imaging features from **predicted** masks.
+- **Default training pipeline (Sections 7–8):** both TN and survival imaging features use **ground-truth** masks from the NPZ `MASK`.
+- **Challenge inference (`src/inference/`):** features are still extracted from **predicted** segmentation masks at deployment time (unchanged).
 - **Matched comparison:** use the **same** `--mask_source` for TN feature extraction, TN probability generation (`predict_tn` on that cache), and survival feature extraction. Point `--tn_predictions` at the matching pickle.
 - There is **no** automatic check that TN and survival mask sources match. Keep them consistent yourself when running a matched study.
 - `--seg_model` is required when `--mask_source predicted` and ignored when `--mask_source ground_truth`.
@@ -193,18 +192,7 @@ python -m survival.extract_surv_features \
     --output_file /path/to/output/survival/fold1_pred/survival_features.pkl
 ```
 
-Example: survival features from **ground-truth** masks (oracle imaging features; still uses TN probabilities from `--tn_predictions`):
-
-```bash
-python -m survival.extract_surv_features \
-    --data_dir /path/to/preprocessed_data/ \
-    --clinical_csv /path/to/HECKTOR_2026_training_data.csv \
-    --tn_predictions /path/to/output/tn_staging/fold1/tn_predictions.pkl \
-    --mask_source ground_truth \
-    --train_samples /path/to/data_splits/fold1_train.npy \
-    --valid_samples /path/to/data_splits/fold1_valid.npy \
-    --output_file /path/to/output/survival/fold1_gt/survival_features.pkl
-```
+Section 8 uses ground-truth masks by default. The predicted example above is for the ablation only.
 
 ## 10. Repeat for the Remaining Folds
 
@@ -215,7 +203,7 @@ Repeat **Sections 6–8** (and Section 9 if running the ablation) for Folds **2�
 1. **TN labels:** Train TN models on data splits (if you want to try a top split for validating the repository code) that include all T (T0–T4) and N (N0–N3) stages so probability vectors stay 5- and 4-dimensional; otherwise, survival feature extraction may fail (expected 41 features).
 2. **Survival metrics:** C-index requires **at least one event** (`Relapse == 1`) in validation (and in training if train C-index is reported). All-censored sets will raise an error.
 3. **NumPy / imgaug:** Segmentation augmentation uses `imgaug`. On setup or training errors, try changing the NumPy version (see `requirements.txt`) and reinstalling—pin conflicts vary by environment.
-4. **Mask source:** TN defaults to `--mask_source ground_truth`; survival defaults to `--mask_source predicted`. For a matched GT vs predicted comparison, use the same source for TN features, TN probabilities, and survival imaging features. The scripts do not enforce this.
+4. **Mask source:** TN and survival training extractors default to `--mask_source ground_truth`. For predicted-mask experiments, pass `--mask_source predicted` and `--seg_model`. Use the same source for TN features, TN probabilities, and survival imaging features in a matched comparison. The scripts do not enforce this. Inference still uses predicted masks (see Section 9).
 
 ## Pre-trained Model Weights
 

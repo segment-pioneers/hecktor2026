@@ -104,7 +104,7 @@ def build_dataset(
     tn_predictions,
     seg_model,
     device,
-    mask_source="predicted",
+    mask_source="ground_truth",
 ):
     X = []
 
@@ -201,7 +201,7 @@ def main(
     output_file,
     seg_model=None,
     device="cpu",
-    mask_source="predicted",
+    mask_source="ground_truth",
 ):
 
     print("Loading clinical CSV...")
@@ -367,8 +367,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mask_source",
         choices=["ground_truth", "predicted"],
-        default="predicted",
-        help="Use fold segmentation predictions (predicted) or NPZ MASK (ground_truth)",
+        default="ground_truth",
+        help="Use NPZ MASK (ground_truth) or fold segmentation predictions (predicted)",
     )
 
     parser.add_argument(
