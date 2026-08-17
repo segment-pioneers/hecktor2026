@@ -504,9 +504,17 @@ def node_features(
 # Single Case Feature Extraction
 # ------------------------------------------------------------
 
+def build_combined_mask(pred_tumor, pred_node):
+    mask = np.zeros_like(pred_tumor, dtype=np.uint8)
+    mask[pred_tumor > 0] = 1
+    mask[pred_node > 0] = 2
+    return mask
+
+
 def extract_case_features(
     npz_path,
     clinical_row,
+    mask=None,
 ):
 
     npz_data = np.load(npz_path)
@@ -516,10 +524,11 @@ def extract_case_features(
         dtype=np.float32
     )
 
-    mask = np.asarray(
-        npz_data["MASK"],
-        dtype=np.uint8
-    )
+    if mask is None:
+        mask = np.asarray(
+            npz_data["MASK"],
+            dtype=np.uint8
+        )
 
     gt_tumor, gt_node = masks_from_gt(mask)
 
@@ -583,6 +592,9 @@ def build_feature_table(
     data_dir,
     sample_names,
     clinical_csv,
+    mask_source="ground_truth",
+    seg_model=None,
+    device="cpu",
 ):
 
     clinical_df = pd.read_csv(
@@ -592,6 +604,25 @@ def build_feature_table(
     clinical_df = clinical_df.set_index(
         "PatientID"
     )
+
+    seg_model_obj = None
+
+    if mask_source == "predicted":
+
+        from segmentation.model_inference import (
+            load_segmentation_model,
+            predict_masks,
+        )
+
+        if seg_model is None:
+            raise ValueError(
+                "--seg_model is required when --mask_source predicted"
+            )
+
+        seg_model_obj = load_segmentation_model(
+            seg_model,
+            device,
+        )
 
     X = []
 
@@ -612,9 +643,38 @@ def build_feature_table(
             patient_id
         ]
 
+        mask = None
+
+        if mask_source == "predicted":
+
+            npz_data = np.load(npz_path)
+
+            pet = np.asarray(
+                npz_data["PET"],
+                dtype=np.float32
+            )
+
+            ct = np.asarray(
+                npz_data["CT"],
+                dtype=np.float32
+            )
+
+            pred_tumor, pred_node = predict_masks(
+                seg_model_obj,
+                pet,
+                ct,
+                device,
+            )
+
+            mask = build_combined_mask(
+                pred_tumor,
+                pred_node
+            )
+
         feat = extract_case_features(
             npz_path,
             clinical_row,
+            mask=mask,
         )
 
         X.append(feat)
@@ -635,7 +695,8 @@ def build_feature_table(
 def save_feature_cache(
     cache_path,
     X,
-    patient_ids
+    patient_ids,
+    mask_source="ground_truth",
 ):
 
     with open(
@@ -646,7 +707,8 @@ def save_feature_cache(
         pickle.dump(
             {
                 "X": X,
-                "patient_ids": patient_ids
+                "patient_ids": patient_ids,
+                "mask_source": mask_source,
             },
             f
         )

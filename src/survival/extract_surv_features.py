@@ -6,8 +6,8 @@ Build survival features for one fold.
 Inputs
 ------
 Clinical CSV
-NPZ files (PET, CT)
-Stage-I segmentation model (predicted GTVp/GTVn masks)
+NPZ files (PET, CT, MASK)
+Stage-I segmentation model (when --mask_source predicted)
 TN probability predictions
 
 Outputs
@@ -43,6 +43,13 @@ def load_pet_ct(npz_path):
     return data["PET"], data["CT"]
 
 
+def load_gt_mask(npz_path):
+
+    data = np.load(npz_path)
+
+    return np.asarray(data["MASK"], dtype=np.uint8)
+
+
 def build_combined_mask(pred_tumor, pred_node):
     mask = np.zeros_like(pred_tumor, dtype=np.uint8)
     mask[pred_tumor > 0] = 1
@@ -68,6 +75,28 @@ def load_tn_predictions(path):
 # Dataset Builder
 # ============================================================
 
+def resolve_mask(
+    npz_path,
+    pet,
+    ct,
+    mask_source,
+    seg_model,
+    device,
+):
+
+    if mask_source == "ground_truth":
+        return load_gt_mask(npz_path)
+
+    pred_tumor, pred_node = predict_masks(
+        seg_model,
+        pet,
+        ct,
+        device,
+    )
+
+    return build_combined_mask(pred_tumor, pred_node)
+
+
 def build_dataset(
     sample_names,
     data_dir,
@@ -75,6 +104,7 @@ def build_dataset(
     tn_predictions,
     seg_model,
     device,
+    mask_source="predicted",
 ):
     X = []
 
@@ -117,14 +147,14 @@ def build_dataset(
 
         pet, ct = load_pet_ct(npz_path)
 
-        pred_tumor, pred_node = predict_masks(
-            seg_model,
+        mask = resolve_mask(
+            npz_path,
             pet,
             ct,
+            mask_source,
+            seg_model,
             device,
         )
-
-        mask = build_combined_mask(pred_tumor, pred_node)
 
         tn_entry = tn_predictions[patient_id]
 
@@ -166,11 +196,12 @@ def main(
     data_dir,
     clinical_csv,
     tn_predictions,
-    seg_model,
     train_samples,
     valid_samples,
     output_file,
+    seg_model=None,
     device="cpu",
+    mask_source="predicted",
 ):
 
     print("Loading clinical CSV...")
@@ -183,11 +214,18 @@ def main(
         tn_predictions
     )
 
-    print(f"Loading segmentation model: {seg_model}")
-    seg_model_obj = load_segmentation_model(
-        seg_model,
-        device,
-    )
+    print(f"mask_source: {mask_source}")
+
+    seg_model_obj = None
+
+    if mask_source == "predicted":
+        print(f"Loading segmentation model: {seg_model}")
+        seg_model_obj = load_segmentation_model(
+            seg_model,
+            device,
+        )
+    else:
+        print("Using ground-truth MASK from NPZ (segmentation model not loaded)")
 
     print("Loading fold splits...")
 
@@ -222,6 +260,7 @@ def main(
         tn_predictions,
         seg_model_obj,
         device,
+        mask_source=mask_source,
     )
 
     print("\nBuilding valid features...")
@@ -237,6 +276,7 @@ def main(
         tn_predictions,
         seg_model_obj,
         device,
+        mask_source=mask_source,
     )
 
     assert len(FEATURE_NAMES) == X_train.shape[1], (
@@ -266,11 +306,18 @@ def main(
 
         "feature_names":
             FEATURE_NAMES,
+
+        "mask_source":
+            mask_source,
     }
 
     print(
         f"\nSaving: {output_file}"
     )
+
+    out_dir = os.path.dirname(os.path.abspath(output_file))
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
 
     with open(output_file, "wb") as f:
         pickle.dump(
@@ -291,6 +338,10 @@ def main(
 
     print(
         f"Features: {len(FEATURE_NAMES)}"
+    )
+
+    print(
+        f"mask_source: {mask_source}"
     )
 
 
@@ -314,9 +365,16 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        "--mask_source",
+        choices=["ground_truth", "predicted"],
+        default="predicted",
+        help="Use fold segmentation predictions (predicted) or NPZ MASK (ground_truth)",
+    )
+
+    parser.add_argument(
         "--seg_model",
-        required=True,
-        help="Stage-I best.pt for this fold",
+        default=None,
+        help="Stage-I best.pt for this fold; required when --mask_source predicted, ignored otherwise",
     )
 
     parser.add_argument(
@@ -341,5 +399,8 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+    if args.mask_source == "predicted" and not args.seg_model:
+        parser.error("--seg_model is required when --mask_source predicted")
 
     main(**vars(args))

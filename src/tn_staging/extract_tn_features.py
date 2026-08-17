@@ -66,7 +66,14 @@ def load_all_npz_files(data_dir):
 # Main
 # ------------------------------------------------------------
 
-def extract_features(data_dir, clinical_csv, output_cache):
+def extract_features(
+    data_dir,
+    clinical_csv,
+    output_cache,
+    mask_source="ground_truth",
+    seg_model=None,
+    device="cpu",
+):
 
     output_dir = os.path.dirname(output_cache)
 
@@ -75,16 +82,28 @@ def extract_features(data_dir, clinical_csv, output_cache):
 
     logger = setup_logging(output_dir)
 
+    logger.info("mask_source=%s", mask_source)
+
+    if mask_source == "predicted":
+        logger.info("Segmentation model: %s", seg_model)
+        logger.info("Device: %s", device)
+
     logger.info("Loading NPZ files...")
 
     sample_names = (load_all_npz_files(data_dir))
 
     logger.info("Found %d NPZ files", len(sample_names))
 
-    logger.info(
-        "Building feature table "
-        "(ground-truth MASK from NPZ)..."
-    )
+    if mask_source == "predicted":
+        logger.info(
+            "Building feature table "
+            "(predicted masks from segmentation model)..."
+        )
+    else:
+        logger.info(
+            "Building feature table "
+            "(ground-truth MASK from NPZ)..."
+        )
 
     start_time = time.time()
 
@@ -93,6 +112,9 @@ def extract_features(data_dir, clinical_csv, output_cache):
             data_dir=data_dir,
             sample_names=sample_names,
             clinical_csv=clinical_csv,
+            mask_source=mask_source,
+            seg_model=seg_model,
+            device=device,
         )
     )
 
@@ -104,13 +126,19 @@ def extract_features(data_dir, clinical_csv, output_cache):
 
     logger.info("Saving feature cache...")
 
-    tn_features.save_feature_cache(output_cache, X, patient_ids)
+    tn_features.save_feature_cache(
+        output_cache,
+        X,
+        patient_ids,
+        mask_source=mask_source,
+    )
 
     logger.info("Saved: %s", output_cache)
 
     logger.info("Done.")
 
     print("\n=== Feature Extraction Complete ===")
+    print(f"mask_source : {mask_source}")
     print(f"Patients : {len(patient_ids)}")
     print(f"Features : {X.shape[1]}")
     print(f"Cache    : {output_cache}")
@@ -127,12 +155,37 @@ if __name__ == "__main__":
     parser.add_argument("--data_dir", type=str, required=True, help="Directory containing .npz files")
     parser.add_argument("--clinical_csv", type=str, required=True, help="HECKTOR clinical CSV")
     parser.add_argument("--output_cache", type=str, required=True, help="Output .pkl file")
+    parser.add_argument(
+        "--mask_source",
+        type=str,
+        choices=["ground_truth", "predicted"],
+        default="ground_truth",
+        help="Use NPZ MASK (ground_truth) or fold segmentation predictions (predicted)",
+    )
+    parser.add_argument(
+        "--seg_model",
+        type=str,
+        default=None,
+        help="Fold segmentation best.pt; required when --mask_source predicted, ignored otherwise",
+    )
+    parser.add_argument(
+        "--device",
+        type=str,
+        default="cpu",
+        help="cpu or cuda (used when --mask_source predicted)",
+    )
 
     args = parser.parse_args()
+
+    if args.mask_source == "predicted" and not args.seg_model:
+        parser.error("--seg_model is required when --mask_source predicted")
 
     extract_features(
         data_dir=args.data_dir,
         clinical_csv=args.clinical_csv,
         output_cache=args.output_cache,
+        mask_source=args.mask_source,
+        seg_model=args.seg_model,
+        device=args.device,
     )
 
