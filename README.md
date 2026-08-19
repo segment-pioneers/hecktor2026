@@ -82,7 +82,7 @@ python -m segmentation.train_seg \
 
 ### 7.1 Extract Handcrafted Features
 
-Extract handcrafted radiomic, anatomical, and clinical features from the preprocessed data. By default, masks are taken from the NPZ **ground-truth** `MASK` (`--mask_source ground_truth`).
+Extract handcrafted radiomic, anatomical, and clinical features from the preprocessed data. By default, masks are taken from the NPZ **ground-truth** `MASK` (`--mask_source ground_truth`). The complete named feature lists (TN: 37; RFS: 41) and missing-value handling are documented in [`src/FEATURES.md`](src/FEATURES.md).
 
 ```bash
 python -m tn_staging.extract_tn_features \
@@ -204,6 +204,7 @@ Repeat **Sections 6–8** (and Section 9 if running the ablation) for Folds **2�
 2. **Survival metrics:** C-index requires **at least one event** (`Relapse == 1`) in validation (and in training if train C-index is reported). All-censored sets will raise an error.
 3. **NumPy / imgaug:** Segmentation augmentation uses `imgaug`. On setup or training errors, try changing the NumPy version (see `requirements.txt`) and reinstalling—pin conflicts vary by environment.
 4. **Mask source:** TN and survival training extractors default to `--mask_source ground_truth`. For predicted-mask experiments, pass `--mask_source predicted` and `--seg_model`. Use the same source for TN features, TN probabilities, and survival imaging features in a matched comparison. The scripts do not enforce this. Inference still uses predicted masks (see Section 9).
+5. **Features:** Exact TN and RFS feature definitions and missing-value encoding: [`src/FEATURES.md`](src/FEATURES.md).
 
 ## Pre-trained Model Weights
 
