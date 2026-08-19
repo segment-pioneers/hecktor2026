@@ -4,7 +4,7 @@ This document lists the exact feature vectors used for TN staging (37 features) 
 
 Implementation:
 
-- TN: `tn_staging/tn_features.py`
+- TN: `tn_staging/tn_features.py` (no named array; names below follow `extract_case_features` order)
 - RFS: `survival/surv_features.py` (`FEATURE_NAMES`)
 
 ---
@@ -15,23 +15,23 @@ Implementation:
 
 **RFS (clinical).** HPV, tobacco, and alcohol use the same value + missing-indicator encoding. Performance status (0–4) uses the same pair (0 if missing). Treatment is a 3-way one-hot (`0`, `1`, `2`) plus a missing indicator; if treatment is missing, the one-hot vector is all zeros and the indicator is 1.
 
-**Imaging.** There are no imputed radiomic values. If GTVp or GTVn is empty, volumes, SUV statistics, bounding boxes, centroids, and related descriptors are set to 0.
+**Imaging.** There are no imputed radiomic values. If GTVp or GTVn is empty, volumes, PET intensity statistics, bounding boxes, centroids, and related descriptors are set to 0. Metabolic descriptors are mean / max / std of the **z-scored PET crop** inside the mask (not raw SUV).
 
 ---
 
 ## TN staging (37 features)
 
-Order matches `extract_case_features` (tumor, then nodes, then interaction, then clinical).
+Order matches `extract_case_features` (tumor, then nodes, then interaction, then clinical). Feature names in this section are documentation labels only; `tn_features.py` does not define a `FEATURE_NAMES` list.
 
 ### Tumor / GTVp (14) — burden, metabolic, geometric, spatial
 
 | # | Name | Category | Definition |
 |---|---|---|---|
 | 1 | `tumor_volume` | Anatomical | GTVp voxel count (mm³ at 1 mm spacing) |
-| 2–4 | `tumor_suv_mean`, `tumor_suv_max`, `tumor_suv_std` | Metabolic | SUV mean / max / std inside GTVp |
+| 2–4 | `tumor_suv_mean`, `tumor_suv_max`, `tumor_suv_std` | Metabolic | PET intensity (z-scored crop) mean / max / std inside GTVp |
 | 5–7 | `tumor_bbox_x`, `tumor_bbox_y`, `tumor_bbox_z` | Geometric | Axis-aligned bounding-box extents (mm) |
 | 8–10 | `tumor_centroid_x`, `tumor_centroid_y`, `tumor_centroid_z` | Spatial | Mean voxel coordinates of GTVp |
-| 11 | `tumor_tlg` | Metabolic | Total lesion glycolysis = volume × SUV mean |
+| 11 | `tumor_tlg` | Metabolic | Volume × PET intensity mean (z-scored crop) |
 | 12–14 | `tumor_bbox_ratio_xy`, `tumor_bbox_ratio_xz`, `tumor_bbox_ratio_yz` | Geometric | Bounding-box aspect ratios |
 
 ### Nodes / GTVn (13) — burden, metabolic, distribution, tumor–node geometry
@@ -41,7 +41,7 @@ Order matches `extract_case_features` (tumor, then nodes, then interaction, then
 | 15 | `node_volume` | Anatomical | Total GTVn voxel count (mm³) |
 | 16 | `largest_node_volume` | Anatomical | Largest connected-component volume (mm³) |
 | 17 | `node_count` | Anatomical | Number of connected GTVn components |
-| 18–20 | `node_suv_mean`, `node_suv_max`, `node_suv_std` | Metabolic | SUV statistics inside GTVn |
+| 18–20 | `node_suv_mean`, `node_suv_max`, `node_suv_std` | Metabolic | PET intensity (z-scored crop) mean / max / std inside GTVn |
 | 21 | `bilateral_involvement` | Anatomical | 1 if node components exist on both sides of the crop midline, else 0 |
 | 22–24 | `node_spread_x`, `node_spread_y`, `node_spread_z` | Spatial | Range of node-component centroids along each axis (0 if fewer than two components) |
 | 25 | `max_inter_node_distance` | Spatial | Maximum Euclidean distance between node-component centroids |
@@ -86,14 +86,14 @@ Order matches `FEATURE_NAMES` in `survival/surv_features.py`.
 | Name | Category | Definition |
 |---|---|---|
 | `tumor_volume` | Anatomical | GTVp voxel count (mm³) |
-| `tumor_suv_mean`, `tumor_suv_max`, `tumor_suv_std` | Metabolic | SUV statistics in GTVp |
+| `tumor_suv_mean`, `tumor_suv_max`, `tumor_suv_std` | Metabolic | PET intensity (z-scored crop) mean / max / std in GTVp |
 | `bbox_x`, `bbox_y`, `bbox_z` | Geometric | GTVp bounding-box extents (mm) |
 | `maximum_diameter` | Geometric | Max of the three GTVp bbox extents |
 | `node_volume` | Anatomical | Total GTVn voxel count |
 | `largest_node_volume` | Anatomical | Largest GTVn connected-component volume |
 | `node_count` | Anatomical | Number of GTVn connected components |
-| `node_suv_mean`, `node_suv_max`, `node_suv_std` | Metabolic | SUV statistics in GTVn |
-| `tumor_tlg`, `node_tlg` | Metabolic | Volume × SUV mean for GTVp and GTVn |
+| `node_suv_mean`, `node_suv_max`, `node_suv_std` | Metabolic | PET intensity (z-scored crop) mean / max / std in GTVn |
+| `tumor_tlg`, `node_tlg` | Metabolic | Volume × PET intensity mean (z-scored crop) for GTVp and GTVn |
 | `tumor_sphericity` | Morphology | \((36\pi V^2)^{1/3} / A\) using an eroded-boundary surface estimate \(A\) |
 | `tumor_compactness` | Morphology | \(V / \sqrt{A}\) |
 
