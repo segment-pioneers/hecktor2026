@@ -8,7 +8,7 @@
 
 The following steps reproduce the complete five-fold cross-validation pipeline used in this study. The commands below illustrate the workflow for **Fold 1**. The same procedure should be repeated for the remaining folds by replacing the corresponding training and validation split files and output directories.
 
-It is assumed that the HECKTOR 2026 dataset has already been downloaded from the official challenge website and preprocessed according to the instructions provided in this repository.
+It is assumed that the HECKTOR 2026 dataset has already been downloaded from the official challenge website and preprocessed according to the instructions in [`src/preprocessing/README.md`](src/preprocessing/README.md).
 
 ## 1. Clone the Repository
 
@@ -42,6 +42,9 @@ pip install -r requirements.txt
 ```
 
 ## 3. Preprocess the Data
+
+See [`src/preprocessing/README.md`](src/preprocessing/README.md) for the preprocessing pipeline and anatomical-prior crop coverage analysis.
+
 Before training, run `src/preprocessing/Preprocess_224.ipynb`.
 - Set `ROOT` to the raw HECKTOR data root and `DESTINATION` to the output folder for preprocessed `.npz` files.
 - Run all cells to resample to 1 mm isotropic and produce 224³ NPZ volumes.

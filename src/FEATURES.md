@@ -11,7 +11,7 @@ Implementation:
 
 ## Missing-value handling
 
-**TN staging (clinical).** Age and gender are used as numeric values. HPV status, tobacco consumption, and alcohol consumption each contribute a pair: the observed value (0 if missing) and a binary missing indicator (1 if missing, else 0).
+**TN staging (clinical).** Age and gender are used as numeric values and have no missing values in this dataset (no missing indicators). HPV status, tobacco consumption, and alcohol consumption each contribute a pair: the observed value (0 if missing) and a binary missing indicator (1 if missing, else 0).
 
 **RFS (clinical).** HPV, tobacco, and alcohol use the same value + missing-indicator encoding. Performance status (0–4) uses the same pair (0 if missing). Treatment is a 3-way one-hot (`0`, `1`, `2`) plus a missing indicator; if treatment is missing, the one-hot vector is all zeros and the indicator is 1.
 
@@ -94,8 +94,8 @@ Order matches `FEATURE_NAMES` in `survival/surv_features.py`.
 | `node_count` | Anatomical | Number of GTVn connected components |
 | `node_suv_mean`, `node_suv_max`, `node_suv_std` | Metabolic | PET intensity (z-scored crop) mean / max / std in GTVn |
 | `tumor_tlg`, `node_tlg` | Metabolic | Volume × PET intensity mean (z-scored crop) for GTVp and GTVn |
-| `tumor_sphericity` | Morphology | \((36\pi V^2)^{1/3} / A\) using an eroded-boundary surface estimate \(A\) |
-| `tumor_compactness` | Morphology | \(V / \sqrt{A}\) |
+| `tumor_sphericity` | Morphology | `(36 * pi * V^2)^(1/3) / A`, where `A` is an eroded-boundary surface estimate |
+| `tumor_compactness` | Morphology | `V / sqrt(A)` |
 
 ### TN-stage probabilities (9)
 
