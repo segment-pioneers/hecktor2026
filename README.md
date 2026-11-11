@@ -8,11 +8,32 @@
 
 **Team name:** Segment Pioneers
 
-**Status:** Companion code for the HECKTOR 2026 challenge paper *(Accepted).*
+**Status:** Companion code for the MICCAI 2026 HECKTOR Challenge paper (5th place; open-access camera-ready available).
+
+## Paper
+
+Yasar Mehmood, Christian Anchele Hu, and Maryam Fatima Zaidi.  
+*Deep Learning-Based Segmentation and Feature-Based Clinical Prediction for Head and Neck Cancer.*  
+MICCAI 2026 Workshops and Challenges (HECKTOR), LNCS 17271, 2026. **5th place.**
+
+- **Open-access PDF:** https://papers.miccai.org/miccai-2026-sat/paper/HECKTOR_003.pdf
+- **Paper page:** https://papers.miccai.org/miccai-2026-sat/HECKTOR_003.html
+- **OpenReview:** https://openreview.net/forum?id=IeaB6Z0Kf8
+
+```bibtex
+@InProceedings{MehYas_Deep_MICCAISAT2026,
+  author    = {Mehmood, Yasar and Hu, Christian Anchele and Zaidi, Maryam Fatima},
+  title     = {Deep Learning-Based Segmentation and Feature-Based Clinical Prediction for Head and Neck Cancer},
+  booktitle = {Medical Image Computing and Computer Assisted Intervention -- MICCAI 2026 Workshops and Challenges},
+  year      = {2026},
+  publisher = {Springer Nature Switzerland},
+  volume    = {LNCS 17271}
+}
+```
 
 ## Abstract
 
-Head and neck cancer (HNC) management requires accurate tumor delineation, disease staging, and prognosis to support clinical decision-making. The HEad and neCK TumOR (HECKTOR) 2026 challenge addresses these tasks by introducing a unified benchmark for primary tumor (GTVp) and metastatic lymph node (GTVn) segmentation, TN staging, and recurrence-free survival (RFS) prediction from multimodal PET/CT imaging and clinical data. We propose a modular framework integrating established methods for segmentation, TN staging, and RFS prediction. For segmentation, we adopt the Adaptive Multi-modality Segmentation-to-Survival model (AdaMSS), which learns an adaptive fusion strategy for combining complementary anatomical information from CT and metabolic information from PET. To enable fully automatic inference, the original ground-truth-based cropping strategy of AdaMSS is replaced with a scan-specific anatomical-prior localization procedure. TN staging uses independent CatBoost classifiers trained on compact handcrafted radiomic, anatomical, and clinical features. Finally, RFS prediction uses a Random Survival Forest integrating segmentation-derived features, clinical variables, and probability distributions from the TN staging models. On the HECKTOR 2026 validation set, the framework achieved a weighted score of 0.6630, Mean Dice of 0.6388, T-stage and N-stage balanced accuracies of 0.6155 and 0.5379, respectively, and an RFS C-index of 0.7536. On the held-out test set, it achieved a weighted score of 0.5920, Mean Dice of 0.6386, T-stage and N-stage balanced accuracies of 0.5237 and 0.6032, respectively, and an RFS C-index of 0.5879, placing the team among the top five challenge submissions. These results support the feasibility of integrating established methods within a unified modular framework.
+Head and neck cancer (HNC) management requires accurate tumor delineation, disease staging, and prognosis to support clinical decision-making. The HEad and neCK TumOR (HECKTOR) 2026 challenge addresses these tasks by introducing a unified benchmark for primary tumor (GTVp) and metastatic lymph node (GTVn) segmentation, TN staging, and recurrence-free survival (RFS) prediction from multimodal PET/CT imaging and clinical data. We propose a modular framework integrating established methods for segmentation, TN staging, and RFS prediction. For segmentation, we adopt the Adaptive Multi-modality Segmentation-to-Survival model (AdaMSS), which learns an adaptive fusion strategy for combining complementary anatomical information from CT and metabolic information from PET. To enable fully automatic inference, the original ground-truth-based cropping strategy of AdaMSS is replaced with a scan-specific anatomical-prior localization procedure. TN staging uses independent CatBoost classifiers trained on compact handcrafted radiomic, anatomical, and clinical features. Finally, RFS prediction uses a Random Survival Forest integrating segmentation-derived features, clinical variables, and probability distributions from the TN staging models. On the HECKTOR 2026 validation set, the framework achieved a weighted score of 0.6630, Mean Dice of 0.6388, T-stage and N-stage balanced accuracies of 0.6155 and 0.5379, respectively, and an RFS C-index of 0.7536. On the held-out test set, it achieved a weighted score of 0.5920, Mean Dice of 0.6386, T-stage and N-stage balanced accuracies of 0.5237 and 0.6032, respectively, and an RFS C-index of 0.5879, placing the team **5th** among challenge submissions. These results support the feasibility of integrating established methods within a unified modular framework.
 
 ![Figure 1](Images/fig1.png)
 
